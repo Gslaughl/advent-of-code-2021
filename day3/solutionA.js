@@ -1,4 +1,5 @@
 const { join, map: cappedMap, reduce, flow } = require('lodash/fp');
+const { invertBit, parseBinary } = require('./shared');
 const map = cappedMap.convert({ cap: false });
 
 const incrementTally = binString => (tallyAtIndex, i) => 
@@ -6,16 +7,13 @@ const incrementTally = binString => (tallyAtIndex, i) =>
     ? tallyAtIndex + 1
     : tallyAtIndex
 
-
 const tallyOnesPerIndex = (tallies, binString) => map(incrementTally(binString), tallies)
-
-const invertBit = bit => bit === '1' ? '0' : '1';
 
 const formatTalliesIntoAnswer = inputLength => tallies => {
   const gammaBits = map(tally => tally > (inputLength / 2) ? '1' : '0', tallies);
   const epsilonBits = map(invertBit, gammaBits);
   const [gamma, epsilon] = map(
-    flow(join(''), bin => parseInt(bin, 2)),
+    flow(join(''), parseBinary),
     [gammaBits, epsilonBits]
   );
   return gamma * epsilon
